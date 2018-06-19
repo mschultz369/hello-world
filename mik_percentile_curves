@@ -1,0 +1,48 @@
+library(dplyr)
+library(ipumsr)
+library(extrafont)
+newIPUMS <- read.csv2("/Users/Mschultz/Desktop/newdataset.csv", header = TRUE, sep=",")
+newIPUMS_12_20 <- filter(newIPUMS, AGE>11, AGE<21)
+
+#creating new weight variable#
+newIPUMS_12_20 <- mutate(newIPUMS_12_20, new_weight = case_when(
+  AGE < 18 ~ WEIGHTKID, 
+  AGE >= 18 ~ WEIGHT))
+
+
+#creating new height variable#
+newIPUMS_12_20 <- mutate(newIPUMS_12_20, new_height = case_when(
+  AGE < 18 ~ HEIGHTKID, 
+  AGE >= 18 ~ HEIGHT))
+
+#creating new BMI variable#
+newIPUMS_12_20 <- mutate(newIPUMS_12_20, new_BMI = case_when(
+  AGE < 18 ~ BMIKID, 
+  AGE >= 18 ~ BMI))
+
+newIPUMS_12_20$new_BMI <- as.numeric(newIPUMS_12_20$BMI)
+newIPUMS_12_20$new_BMI
+
+newIPUMS_12_20 <- mutate(newIPUMS_12_20, new_BMI = case_when(
+  AGE < 18 ~ BMIKID/100, 
+  AGE >= 18 ~ BMI))
+
+
+bdata = newIPUMS_12_20[!is.na(newIPUMS_12_20$NHISPID ==""),]
+
+ht = as.numeric(2.54 * newIPUMS_12_20$new_height)
+wt = as.numeric(0.453592 * newIPUMS_12_20$new_weight)
+
+bdata$BMI_kgm2 <- bdata$new_BMI
+table(newIPUMS_12_20$AGE)
+cdc_mdata <- read_excel("/Users/Mschultz/Desktop/Ref_percentile_curves.xlsx", 
+                        sheet = "Males, 2-20 years")
+cdc_mdata$age_m = cdc_mdata$AgeInMonths / 12
+cdc_fdata <- read_excel("/Users/Mschultz/Desktop/Ref_percentile_curves.xlsx", 
+                        sheet = "Females, 2-20 years")
+cdc_fdata$age_m = cdc_fdata$AgeInMonths / 12
+
+m_input = subset(newIPUMS_12_20, SEX==1, select=c(NHISPID, AGE, BMI_kgm2))
+head(m_input)
+dim(m_input)
+
