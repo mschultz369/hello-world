@@ -1,0 +1,110 @@
+library(dplyr)
+library(ipumsr) # You don't need this with how you're reading in files
+library(extrafont)
+library(readxl)
+
+#Change the file path
+newIPUMS <- read_excel("/Users/Mschultz/Desktop/newdataset2.xlsx")
+newIPUMS_12_20 <- filter(newIPUMS, AGE>11, AGE<21)
+
+#Creating New Weight Variable
+newIPUMS_12_20 <- mutate(newIPUMS_12_20, new_weight = case_when(
+  AGE < 18 ~ WEIGHTKID, 
+  AGE >= 18 ~ WEIGHT))
+
+#Creating New Height Variable
+newIPUMS_12_20 <- mutate(newIPUMS_12_20, new_height = case_when(
+  AGE < 18 ~ HEIGHTKID, 
+  AGE >= 18 ~ HEIGHT))
+
+#Creating New BMI Variable
+newIPUMS_12_20 <- mutate(newIPUMS_12_20, new_BMI = case_when(
+  AGE < 18 ~ BMIKID/100, 
+  AGE >= 18 ~ BMI))
+
+# Filter out missing data based on height and weight
+newIPUMS_12_20 <- filter(newIPUMS_12_20, new_height > 40, new_height < 90)
+newIPUMS_12_20 <- filter(newIPUMS_12_20, new_weight > 20, new_weight < 500)
+
+bdata = newIPUMS_12_20[!is.na(newIPUMS_12_20$NHISPID ==""),]
+
+ht = as.numeric(2.54 * newIPUMS_12_20$new_height)
+wt = as.numeric(0.453592 * newIPUMS_12_20$new_weight)
+
+bdata$BMI_kgm2 <- bdata$new_BMI
+table(newIPUMS_12_20$AGE)
+
+#Uploading Male and Female CDC files
+cdc_mdata <- read_excel("/Users/Mschultz/Desktop/Ref_percentile_curves.xlsx", 
+                        sheet = "Males, 2-20 years")
+cdc_mdata$age_m = cdc_mdata$AgeInMonths / 12
+cdc_fdata <- read_excel("/Users/Mschultz/Desktop/Ref_percentile_curves.xlsx", 
+                        sheet = "Females, 2-20 years")
+cdc_fdata$age_m = cdc_fdata$AgeInMonths / 12
+
+#Subsetting Males ONLY graph
+m_input = subset(bdata, SEX==1, select=c(NHISPID, AGE, BMI_kgm2))
+head(m_input)
+dim(m_input)
+
+#Creating an AgeInMonths variable
+m_input <- mutate(m_input, AgeInMonths = 12*AGE + 0.5)
+
+#Creating Graphs
+loadfonts()
+
+par(mar=c(4.4,5,2,1))
+par(oma=c(1,1,0,0))
+par(las=1)
+plot(x=m_input$AgeInMonths, y=m_input$BMI_kgm2, xlab="", ylab=expression(bold(paste("Body Mass Index (kg/m"^"2",")"))), type="n", axes=FALSE, xlim=c(10,30), ylim=c(10,50))
+title("Males", line=-0.5, adj=0)
+mtext("Age (years)", side=1, line=3, adj=0.35, font=2)
+points(x=jitter(m_input$AGE), y=m_input$BMI_kgm2, type="p", pch=19, cex=0.6, col=rgb(red=0.5,blue=0.5,green=0.5,alpha=.2))
+axis(side =1, at=c(10, 20), labels = c("",""), lwd.ticks=0)
+axis(side =1, at= seq(10, 20, by=2), lwd=0, lwd.ticks=1)
+axis(side =2, at= seq(10, 50, by=2), cex.axis=0.8)
+lines(cdc_mdata$age_m, cdc_mdata$m5,type="l", lwd=2, col="black")
+lines(cdc_mdata$age_m, cdc_mdata$m50, type="l", lwd=2, col="green4")
+lines(cdc_mdata$age_m, cdc_mdata$m85, type="l", lwd=2, col="mediumblue")
+lines(cdc_mdata$age_m, cdc_mdata$m95, type="l", lwd=2, col="red1")
+lines(cdc_mdata$age_m, cdc_mdata$mSevereC2, type="l", lwd=2, col="tan4")
+lines(cdc_mdata$age_m, cdc_mdata$mSevereC3, type="l", lwd=2, col="orange")
+
+# Remove comment and change variables for longitudinal data
+#len = unique(m_input$NHISPID)
+#table = aggregate(data.frame(count=m_input$NHISPID),list(value=m_input$NHISPID), length)
+#if (table$count[1] > 1){
+#  for (i in len) 
+#  {
+#    lines(m_input$Age_y[m_input$NHISPID==i], m_input$BMI_kgm2[m_input$NHISPID==i],type="l", lty=1, col=i+5)
+#  }}
+
+text(20, 19, expression(bold(paste("5"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 23, expression(bold(paste("50"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 28.5, "Overweight: ", cex=0.8, pos=4, font=2)
+text(20, 27, expression(bold(paste("85"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 32.5, "Obese Class 1: ", cex=0.8, pos=4,font=2)
+text(20, 31, expression(bold(paste("95"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 38.5, "Severe Obesity Class 2: ", cex=0.8, pos=4, font=2)
+text(20, 37, expression(bold(paste("120% of 95"^"th"," percentile"))), cex=0.8, pos=4)
+text(20, 44.5, "Severe Obesity Class 3: ", cex=0.8, pos=4, font=2)
+text(20, 43, expression(bold(paste("140% of 95"^"th", " percentile"))), cex=0.8, pos=4)
+
+#Creating a missing variable the loop will fill in#
+m_input$BMI_5 <- rep(NA, nrow(m_input))
+m_input$BMI_50 <- rep(NA, nrow(m_input))
+
+#Creating Loop Function
+for(i in 1:nrow(m_input)) {
+  age <- m_input$AgeInMonths[i]
+  m_input$BMI_5[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 3]
+  m_input$BMI_50[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 6]
+}
+
+#Converting To Numeric Variables
+m_input$BMI_5 <- as.numeric(m_input$BMI_5)
+m_input$BMI_50 <- as.numeric(m_input$BMI_50)
+head(m_input$BMI_5)
+
+mean(m_input$BMI_kgm2 < m_input$BMI_5)
+mean(m_input$BMI_kgm2 < m_input$BMI_50)
