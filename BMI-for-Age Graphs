@@ -45,12 +45,14 @@ cdc_fdata <- read_excel("/Users/Mschultz/Desktop/Ref_percentile_curves.xlsx",
                         sheet = "Females, 2-20 years")
 cdc_fdata$age_m = cdc_fdata$AgeInMonths / 12
 
-#Subsetting data for Males
+#Subsetting data for Males and Females
 m_input = subset(bdata, SEX==1, select=c(NHISPID, AGE, new_BMI))
-head(m_input)
+f_input = subset(bdata, SEX==2, select=c(NHISPID, AGE, new_BMI))
+head(f_input)
 
-#Creating an AgeInMonths variable for Males
+#Creating an AgeInMonths variable for Males and Females
 m_input <- mutate(m_input, AgeInMonths = 12*AGE + 0.5)
+f_input <- mutate(f_input, AgeInMonths = 12*AGE + 0.5)
 
 loadfonts()
 
@@ -83,13 +85,6 @@ text(20, 37, expression(bold(paste("120% of 95"^"th"," percentile"))), cex=0.8, 
 text(20, 44.5, "Severe Obesity Class 3: ", cex=0.8, pos=4, font=2)
 text(20, 43, expression(bold(paste("140% of 95"^"th", " percentile"))), cex=0.8, pos=4)
 
-#Subsetting data Females
-f_input = subset(bdata, SEX==2, select=c(NHISPID, AGE, new_BMI))
-head(f_input)
-
-#Creating an AgeInMonths variable Females
-f_input <- mutate(f_input, AgeInMonths = 12*AGE + 0.5)
-
 
 #Creating Graph for Females
 par(mar=c(4.4,5,2,1))
@@ -107,6 +102,17 @@ lines(cdc_fdata$age_m, cdc_fdata$f85, type="l", lwd=2, col="mediumblue")
 lines(cdc_fdata$age_m, cdc_fdata$f95, type="l", lwd=2, col="red1")
 lines(cdc_fdata$age_m, cdc_fdata$fSevereC2, type="l", lwd=2, col="tan4")
 lines(cdc_fdata$age_m, cdc_fdata$fSevereC3, type="l", lwd=2, col="orange")
+
+text(20, 19, expression(bold(paste("5"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 23, expression(bold(paste("50"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 28.5, "Overweight: ", cex=0.8, pos=4, font=2)
+text(20, 27, expression(bold(paste("85"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 32.5, "Obese Class 1: ", cex=0.8, pos=4,font=2)
+text(20, 31, expression(bold(paste("95"^"th", " percentile"))), cex=0.8, pos=4)
+text(20, 38.5, "Severe Obesity Class 2: ", cex=0.8, pos=4, font=2)
+text(20, 37, expression(bold(paste("120% of 95"^"th"," percentile"))), cex=0.8, pos=4)
+text(20, 44.5, "Severe Obesity Class 3: ", cex=0.8, pos=4, font=2)
+text(20, 43, expression(bold(paste("140% of 95"^"th", " percentile"))), cex=0.8, pos=4)
 
 #Percentile Cutoffs 
 
