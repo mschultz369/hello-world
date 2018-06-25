@@ -60,9 +60,9 @@ loadfonts()
 par(mar=c(4.4,5,2,1))
 par(oma=c(1,1,0,0))
 par(las=1)
+mycol <- rgb(0, 0, 255, max = 255, alpha = 50, names = "blue50")
 plot(jitter(x=m_input$AGE), y=m_input$new_BMI, xlab="", ylab=expression(bold(paste("Body Mass Index (kg/m"^"2",")"))), axes=FALSE, xlim=c(11,22), ylim=c(10,50), main="Males",type="p", pch=19, cex=0.5, col= mycol)
 mtext("Age (years)", side=1, line=3, adj=0.35, font=2)
-mycol <- rgb(0, 0, 255, max = 255, alpha = 50, names = "blue50")
 axis(side =1, at=c(2, 20), labels = c("",""), lwd.ticks=0)
 axis(side =1, at= seq(2, 20, by=2), lwd=0, lwd.ticks=1)
 axis(side =2, at= seq(10, 50, by=2), cex.axis=0.8)
@@ -73,7 +73,7 @@ lines(cdc_mdata$age_m, cdc_mdata$m95, type="l", lwd=2, col="red1")
 lines(cdc_mdata$age_m, cdc_mdata$mSevereC2, type="l", lwd=2, col="tan4")
 lines(cdc_mdata$age_m, cdc_mdata$mSevereC3, type="l", lwd=2, col="orange")
 
-
+# Change 20 to something like 20.25 so text doesn't overlap data
 text(20, 19, expression(bold(paste("5"^"th", " percentile"))), cex=0.8, pos=4)
 text(20, 23, expression(bold(paste("50"^"th", " percentile"))), cex=0.8, pos=4)
 text(20, 28.5, "Overweight: ", cex=0.8, pos=4, font=2)
@@ -103,6 +103,7 @@ lines(cdc_fdata$age_m, cdc_fdata$f95, type="l", lwd=2, col="red1")
 lines(cdc_fdata$age_m, cdc_fdata$fSevereC2, type="l", lwd=2, col="tan4")
 lines(cdc_fdata$age_m, cdc_fdata$fSevereC3, type="l", lwd=2, col="orange")
 
+# Change text position here too
 text(20, 19, expression(bold(paste("5"^"th", " percentile"))), cex=0.8, pos=4)
 text(20, 23, expression(bold(paste("50"^"th", " percentile"))), cex=0.8, pos=4)
 text(20, 28.5, "Overweight: ", cex=0.8, pos=4, font=2)
@@ -117,6 +118,8 @@ text(20, 43, expression(bold(paste("140% of 95"^"th", " percentile"))), cex=0.8,
 #Percentile Cutoffs 
 
 #Creating a variable in m_input that has missing values for everyone that the loop will fill in
+# The columns in your loop are not the correct ones. Look at cdc_mdata in RStudio
+# You should add the remaining percentiles anyway (3rd, 10th, etc.)
 m_input$BMI_5 <- rep(NA, nrow(m_input))
 m_input$BMI_50 <- rep(NA, nrow(m_input))
 m_input$BMI_85 <- rep(NA, nrow(m_input))
@@ -135,6 +138,7 @@ for(i in 1:nrow(m_input)) {
 }
 
 # Converting cutoff values to numeric 
+# These all say BMI_50 instead of the appropriate numbers
 m_input$BMI_5 <- as.numeric(m_input$BMI_5)
 m_input$BMI_50 <- as.numeric(m_input$BMI_50)
 m_input$BMI_50 <- as.numeric(m_input$BMI_85)
