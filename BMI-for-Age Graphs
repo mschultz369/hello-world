@@ -118,47 +118,83 @@ text(20, 43, expression(bold(paste("140% of 95"^"th", " percentile"))), cex=0.8,
 #Percentile Cutoffs 
 
 #Creating a variable in m_input that has missing values for everyone that the loop will fill in
-# The columns in your loop are not the correct ones. Look at cdc_mdata in RStudio
-# You should add the remaining percentiles anyway (3rd, 10th, etc.)
+m_input$BMI_3 <- rep(NA, nrow(m_input))
 m_input$BMI_5 <- rep(NA, nrow(m_input))
+m_input$BMI_10 <- rep(NA, nrow(m_input))
+m_input$BMI_25 <- rep(NA, nrow(m_input))
 m_input$BMI_50 <- rep(NA, nrow(m_input))
+m_input$BMI_75 <- rep(NA, nrow(m_input))
 m_input$BMI_85 <- rep(NA, nrow(m_input))
+m_input$BMI_90 <- rep(NA, nrow(m_input))
 m_input$BMI_95 <- rep(NA, nrow(m_input))
+m_input$BMI_97 <- rep(NA, nrow(m_input))
 m_input$BMI_120 <- rep(NA, nrow(m_input))
 m_input$BMI_140 <- rep(NA, nrow(m_input))
+
 #Loop function which finds age and then BMI and a butoff for the BMI
 for(i in 1:nrow(m_input)) {
   age <- m_input$AgeInMonths[i]
+  m_input$BMI_3[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 2]
   m_input$BMI_5[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 3]
+  m_input$BMI_10[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 4]
+  m_input$BMI_25[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 5]
   m_input$BMI_50[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 6]
-  m_input$BMI_85[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 7]
-  m_input$BMI_95[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 8]
-  m_input$BMI_120[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 9]
-  m_input$BMI_140[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 10]
+  m_input$BMI_75[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 7]
+  m_input$BMI_85[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 8]
+  m_input$BMI_90[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 9]
+  m_input$BMI_95[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 10]
+  m_input$BMI_97[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 11]
+  m_input$BMI_120[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 12]
+  m_input$BMI_140[i] <- cdc_mdata[cdc_mdata$AgeInMonths == age, 13]
 }
 
 # Converting cutoff values to numeric 
-# These all say BMI_50 instead of the appropriate numbers
+
+m_input$BMI_3 <- as.numeric(m_input$BMI_3)
 m_input$BMI_5 <- as.numeric(m_input$BMI_5)
+m_input$BMI_10 <- as.numeric(m_input$BMI_10)
+m_input$BMI_25 <- as.numeric(m_input$BMI_25)
 m_input$BMI_50 <- as.numeric(m_input$BMI_50)
-m_input$BMI_50 <- as.numeric(m_input$BMI_85)
-m_input$BMI_50 <- as.numeric(m_input$BMI_95)
-m_input$BMI_50 <- as.numeric(m_input$BMI_120)
-m_input$BMI_50 <- as.numeric(m_input$BMI_140)
+m_input$BMI_75 <- as.numeric(m_input$BMI_75)
+m_input$BMI_85 <- as.numeric(m_input$BMI_85)
+m_input$BMI_90 <- as.numeric(m_input$BMI_90)
+m_input$BMI_95 <- as.numeric(m_input$BMI_95)
+m_input$BMI_97 <- as.numeric(m_input$BMI_97)
+m_input$BMI_120 <- as.numeric(m_input$BMI_120)
+m_input$BMI_140 <- as.numeric(m_input$BMI_140)
 
 
 #Checking how many (and the proportion) of people who are below a certain percentile
+
+sum(m_input$new_BMI < m_input$BMI_3)
+mean(m_input$new_BMI < m_input$BMI_3)
+
 sum(m_input$new_BMI < m_input$BMI_5)
 mean(m_input$new_BMI < m_input$BMI_5)
+
+sum(m_input$new_BMI < m_input$BMI_10)
+mean(m_input$new_BMI < m_input$BMI_10)
+
+sum(m_input$new_BMI < m_input$BMI_25)
+mean(m_input$new_BMI < m_input$BMI_25)
 
 sum(m_input$new_BMI < m_input$BMI_50)
 mean(m_input$new_BMI < m_input$BMI_50)
 
+sum(m_input$new_BMI < m_input$BMI_75)
+mean(m_input$new_BMI < m_input$BMI_75)
+
 sum(m_input$new_BMI < m_input$BMI_85)
 mean(m_input$new_BMI < m_input$BMI_85)
 
+sum(m_input$new_BMI < m_input$BMI_90)
+mean(m_input$new_BMI < m_input$BMI_90)
+
 sum(m_input$new_BMI < m_input$BMI_95)
 mean(m_input$new_BMI < m_input$BMI_95)
+
+sum(m_input$new_BMI < m_input$BMI_97)
+mean(m_input$new_BMI < m_input$BMI_97)
 
 sum(m_input$new_BMI < m_input$BMI_120)
 mean(m_input$new_BMI < m_input$BMI_120)
@@ -166,50 +202,84 @@ mean(m_input$new_BMI < m_input$BMI_120)
 sum(m_input$new_BMI < m_input$BMI_140)
 mean(m_input$new_BMI < m_input$BMI_140)
 
-
 #FEMALES
+f_input$BMI_3 <- rep(NA, nrow(f_input))
 f_input$BMI_5 <- rep(NA, nrow(f_input))
+f_input$BMI_10 <- rep(NA, nrow(f_input))
+f_input$BMI_25 <- rep(NA, nrow(f_input))
 f_input$BMI_50 <- rep(NA, nrow(f_input))
+f_input$BMI_75 <- rep(NA, nrow(f_input))
 f_input$BMI_85 <- rep(NA, nrow(f_input))
+f_input$BMI_90 <- rep(NA, nrow(f_input))
 f_input$BMI_95 <- rep(NA, nrow(f_input))
+f_input$BMI_97 <- rep(NA, nrow(f_input))
 f_input$BMI_120 <- rep(NA, nrow(f_input))
 f_input$BMI_140 <- rep(NA, nrow(f_input))
 
-for(i in 1:nrow(f_input)) {
-  age <- f_input$AgeInMonths[i]
+for(i in 1:nrow(m_input)) {
+  age <- m_input$AgeInMonths[i]
+  f_input$BMI_3[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 2]
   f_input$BMI_5[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 3]
+  f_input$BMI_10[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 4]
+  f_input$BMI_25[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 5]
   f_input$BMI_50[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 6]
-  f_input$BMI_85[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 7]
-  f_input$BMI_95[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 8]
-  f_input$BMI_120[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 9]
-  f_input$BMI_140[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 10]
+  f_input$BMI_75[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 7]
+  f_input$BMI_85[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 8]
+  f_input$BMI_90[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 9]
+  f_input$BMI_95[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 10]
+  f_input$BMI_97[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 11]
+  f_input$BMI_120[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 12]
+  f_input$BMI_140[i] <- cdc_fdata[cdc_fdata$AgeInMonths == age, 13]
 }
 
+f_input$BMI_3 <- as.numeric(f_input$BMI_3)
 f_input$BMI_5 <- as.numeric(f_input$BMI_5)
+f_input$BMI_10 <- as.numeric(f_input$BMI_10)
+f_input$BMI_25 <- as.numeric(f_input$BMI_25)
 f_input$BMI_50 <- as.numeric(f_input$BMI_50)
+f_input$BMI_75 <- as.numeric(f_input$BMI_75)
 f_input$BMI_85 <- as.numeric(f_input$BMI_85)
+f_input$BMI_90 <- as.numeric(f_input$BMI_90)
 f_input$BMI_95 <- as.numeric(f_input$BMI_95)
+f_input$BMI_97 <- as.numeric(f_input$BMI_97)
 f_input$BMI_120 <- as.numeric(f_input$BMI_120)
 f_input$BMI_140 <- as.numeric(f_input$BMI_140)
+
+sum(f_input$new_BMI < f_input$BMI_3)
+mean(f_input$new_BMI < f_input$BMI_3)
 
 sum(f_input$new_BMI < f_input$BMI_5)
 mean(f_input$new_BMI < f_input$BMI_5)
 
+sum(f_input$new_BMI < f_input$BMI_10)
+mean(f_input$new_BMI < f_input$BMI_10) 
+
+sum(f_input$new_BMI < f_input$BMI_25)
+mean(f_input$new_BMI < f_input$BMI_25)
+
 sum(f_input$new_BMI < f_input$BMI_50)
 mean(f_input$new_BMI < f_input$BMI_50)
+
+sum(f_input$new_BMI < f_input$BMI_75)
+mean(f_input$new_BMI < f_input$BMI_75)
 
 sum(f_input$new_BMI < f_input$BMI_85)
 mean(f_input$new_BMI < f_input$BMI_85)
 
+sum(f_input$new_BMI < f_input$BMI_90)
+mean(f_input$new_BMI < f_input$BMI_90)
+
 sum(f_input$new_BMI < f_input$BMI_95)
 mean(f_input$new_BMI < f_input$BMI_95)
+
+sum(f_input$new_BMI < f_input$BMI_97)
+mean(f_input$new_BMI < f_input$BMI_97)
 
 sum(f_input$new_BMI < f_input$BMI_120)
 mean(f_input$new_BMI < f_input$BMI_120)
 
 sum(f_input$new_BMI < f_input$BMI_140)
 mean(f_input$new_BMI < f_input$BMI_140)
-
 
 
 
