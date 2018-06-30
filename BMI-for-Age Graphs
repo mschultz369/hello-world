@@ -61,7 +61,10 @@ par(mar=c(4.4,5,2,1))
 par(oma=c(1,1,0,0))
 par(las=1)
 mycol <- rgb(0, 0, 255, max = 255, alpha = 50, names = "blue50")
-plot(jitter(x=m_input$AGE), y=m_input$new_BMI, xlab="", ylab=expression(bold(paste("Body Mass Index (kg/m"^"2",")"))), axes=FALSE, xlim=c(11,22), ylim=c(10,50), main="Males",type="p", pch=19, cex=0.5, col= mycol)
+plot(jitter(x=m_input$AGE), y=m_input$new_BMI, xlab="", 
+      ylab=expression(bold(paste("Body Mass Index (kg/m"^"2",")"))), 
+      axes=FALSE, xlim=c(11,22), ylim=c(10,50), main="Males",
+      type="p", pch=19, cex=0.5, col= mycol)
 mtext("Age (years)", side=1, line=3, adj=0.35, font=2)
 axis(side =1, at=c(2, 20), labels = c("",""), lwd.ticks=0)
 axis(side =1, at= seq(2, 20, by=2), lwd=0, lwd.ticks=1)
@@ -91,7 +94,10 @@ par(mar=c(4.4,5,2,1))
 par(oma=c(1,1,0,0))
 par(las=1)
 mycol2 <- rgb(1, 0, 0, alpha=0.3)
-plot(jitter(x=f_input$AGE), y=f_input$new_BMI, xlab="",ylab=expression(bold(paste("Body Mass Index (kg/m"^"2",")"))), axes=FALSE, xlim=c(11,22), ylim=c(10,50), main="Females",type="p",pch=19, cex=0.5, col=mycol2)
+plot(jitter(x=f_input$AGE), y=f_input$new_BMI, xlab="",
+      ylab=expression(bold(paste("Body Mass Index (kg/m"^"2",")"))), 
+      axes=FALSE, xlim=c(11,22), ylim=c(10,50), main="Females",
+      type="p",pch=19, cex=0.5, col=mycol2)
 mtext("Age (years)", side=1, line=3, adj=0.35, font=2)
 axis(side =1, at=c(2, 20), labels = c("",""), lwd.ticks=0)
 axis(side =1, at= seq(2, 20, by=2), lwd=0, lwd.ticks=1)
@@ -281,6 +287,35 @@ mean(f_input$new_BMI < f_input$BMI_120)
 sum(f_input$new_BMI < f_input$BMI_140)
 mean(f_input$new_BMI < f_input$BMI_140)
 
+
+#Different ggplots, not finalized yet
+newplot <- ggplot(IPUMSdata_12_20, aes(AGE,new_BMI)) 
+      + geom_jitter(shape=16, height=0, alpha = 0.3, 
+        aes(color = as.factor(SEX)))
+
+
+newplot+facet_grid(SEX~RACEBR)
+
+newplot+facet_grid(.~RACEBR, labeller=conversion)
+conversion <- list(
+    '10'= 'White',
+    '20'= 'Black',
+    '30'= 'American Indian',
+    '40'= 'Chinese',
+    '50'= 'Filipino',
+    '60'= 'Asian Indian',
+    '70'= 'Other',
+    '80'= 'Multiple'
+    )
+
+ggplot(IPUMSdata_12_20, aes(AGE, new_BMI)) + 
+      geom_jitter(height=0, alpha = 0.1) + facet_grid(. ~ SEX)
+
+newplot+facet_grid(.~RACESR)
+
+ggplot(IPUMSdata_12_20, aes(AGE, new_BMI)) + 
+            geom_jitter(height=0, alpha = 0.1, aes(color = as.factor(SEX)), 
+            shape = 16) + facet_grid(. ~ RACEBR)
 
 
 
