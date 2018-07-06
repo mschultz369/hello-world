@@ -3,6 +3,7 @@ library(ipumsr)
 library(dplyr)
 library(extrafont)
 library(readxl)
+library(ggplot2)
 
 #Read in data using the IPUMSR package
 ddi <- read_ipums_ddi("nhis_00005.xml")
@@ -76,6 +77,7 @@ lines(cdc_mdata$age_m, cdc_mdata$m95, type="l", lwd=2, col="red1")
 lines(cdc_mdata$age_m, cdc_mdata$mSevereC2, type="l", lwd=2, col="tan4")
 lines(cdc_mdata$age_m, cdc_mdata$mSevereC3, type="l", lwd=2, col="orange")
 
+# Make sure to make this change!
 # Change 20 to something like 20.25 so text doesn't overlap data
 text(20, 19, expression(bold(paste("5"^"th", " percentile"))), cex=0.8, pos=4)
 text(20, 23, expression(bold(paste("50"^"th", " percentile"))), cex=0.8, pos=4)
@@ -109,6 +111,7 @@ lines(cdc_fdata$age_m, cdc_fdata$f95, type="l", lwd=2, col="red1")
 lines(cdc_fdata$age_m, cdc_fdata$fSevereC2, type="l", lwd=2, col="tan4")
 lines(cdc_fdata$age_m, cdc_fdata$fSevereC3, type="l", lwd=2, col="orange")
 
+# This change too!
 # Change text position here too
 text(20, 19, expression(bold(paste("5"^"th", " percentile"))), cex=0.8, pos=4)
 text(20, 23, expression(bold(paste("50"^"th", " percentile"))), cex=0.8, pos=4)
@@ -289,6 +292,8 @@ mean(f_input$new_BMI < f_input$BMI_140)
 
 
 #Different ggplots, not finalized yet
+library(ggplot2)
+
 newplot <- ggplot(IPUMSdata_12_20, aes(AGE,new_BMI)) 
       + geom_jitter(shape=16, height=0, alpha = 0.3, 
         aes(color = as.factor(SEX)))
@@ -296,8 +301,7 @@ newplot <- ggplot(IPUMSdata_12_20, aes(AGE,new_BMI))
 
 newplot+facet_grid(SEX~RACEBR)
 
-newplot+facet_grid(.~RACEBR, labeller=conversion)
-conversion <- list(
+conversion <- c(
     '10'= 'White',
     '20'= 'Black',
     '30'= 'American Indian',
@@ -307,6 +311,8 @@ conversion <- list(
     '70'= 'Other',
     '80'= 'Multiple'
     )
+newplot+facet_grid(.~RACEBR, labeller = labeller(RACEBR = conversion))
+
 
 ggplot(IPUMSdata_12_20, aes(AGE, new_BMI)) + 
       geom_jitter(height=0, alpha = 0.1) + facet_grid(. ~ SEX)
